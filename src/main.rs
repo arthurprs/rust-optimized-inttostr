@@ -8,6 +8,7 @@ use std::ops::{Not, Add};
 use std::mem;
 use std::num::{Zero, One};
 use std::str;
+use std::ptr;
 
 trait AsU64 {
 	fn as_u64(self) -> u64;
@@ -60,22 +61,19 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
 				let d1 = (rem / 100) << 1;
 		        let d2 = (rem % 100) << 1;
 				curr -= 4;
-		        *buf_ptr.offset(curr) = *lut_ptr.offset(d1);
-	            *buf_ptr.offset(curr+1) = *lut_ptr.offset(d1 + 1);
-	            *buf_ptr.offset(curr+2) = *lut_ptr.offset(d2);
-	            *buf_ptr.offset(curr+3) = *lut_ptr.offset(d2 + 1);
+				ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
+				ptr::copy_nonoverlapping(lut_ptr.offset(d2), buf_ptr.offset(curr + 2), 2);
 			}
 
 			// n can be safelly treated as isize from this point on
-			// increases performance on 32bit systems
+			// this increases performance on 32bit systems
 			let mut n = n as isize;
 
 			while n >= 100 {
 				let d1 = (n % 100) << 1;
-				curr -= 2;
-				*buf_ptr.offset(curr) = *lut_ptr.offset(d1);
-				*buf_ptr.offset(curr + 1) = *lut_ptr.offset(d1 + 1);
 				n /= 100;
+				curr -= 2;
+				ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
 			}
 
 			if n < 10 {
@@ -84,8 +82,7 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
 			} else {
 				let d1 = (n as isize) << 1;
 				curr -= 2;
-				*buf_ptr.offset(curr) = *lut_ptr.offset(d1);
-				*buf_ptr.offset(curr + 1) = *lut_ptr.offset(d1 + 1);
+				ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
 			}
 		}
 		
