@@ -12,12 +12,15 @@ use std::ptr;
 
 trait AsU64 {
 	fn as_u64(self) -> u64;
+	fn max_u64() -> u64;
 }
 
 macro_rules! impl_AsU64 {
 	($($t:ident)*) => ($(impl AsU64 for $t {
 		#[inline(always)]
         fn as_u64(self) -> u64 { self as u64 }
+		#[inline(always)]
+        fn max_u64() -> u64 { Self::max_value() as u64 }
     })*)
 }
 
@@ -54,15 +57,35 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
 		let lut_ptr = &DEC_DIGITS_LUT as *const u8;
 
 		unsafe {
-			while n >= 10000 {
-				let rem = (n % 10000) as isize;
-				n /= 10000;
+			// if T::max_u64() >= 100000000 {
+			// 	while n >= 100000000 {
+			// 		let rem = (n % 100000000) as isize;
+			// 		n /= 100000000;
+			//         let b = rem / 10000;
+			//         let c = rem % 10000;
+			//         let d1 = (b / 100) << 1;
+			//         let d2 = (b % 100) << 1;
+			//         let d3 = (c / 100) << 1;
+			//         let d4 = (c % 100) << 1;
+			// 		curr -= 8;
+			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
+			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d2), buf_ptr.offset(curr + 2), 2);
+			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d3), buf_ptr.offset(curr + 4), 2);
+			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d4), buf_ptr.offset(curr + 6), 2);
+			// 	}
+			// }
 
-				let d1 = (rem / 100) << 1;
-		        let d2 = (rem % 100) << 1;
-				curr -= 4;
-				ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
-				ptr::copy_nonoverlapping(lut_ptr.offset(d2), buf_ptr.offset(curr + 2), 2);
+			if T::max_u64() >= 10000 {
+				while n >= 10000 {
+					let rem = (n % 10000) as isize;
+					n /= 10000;
+
+					let d1 = (rem / 100) << 1;
+			        let d2 = (rem % 100) << 1;
+					curr -= 4;
+					ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
+					ptr::copy_nonoverlapping(lut_ptr.offset(d2), buf_ptr.offset(curr + 2), 2);
+				}
 			}
 
 			// n can be safelly treated as isize from this point on

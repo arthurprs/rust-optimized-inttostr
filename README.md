@@ -11,7 +11,7 @@ Running with rust 1.2 nightly @ x64 Linux - Intel(R) Core(TM) i7-2670QM CPU @ 2.
 
 ```
 test tests::_warmup   ... bench:         0 ns/iter (+/- 0)
-test tests::new_08    ... bench:       589 ns/iter (+/- 111)
+test tests::new_08    ... bench:       562 ns/iter (+/- 111)
 test tests::new_16    ... bench:      1424 ns/iter (+/- 60)
 test tests::new_32    ... bench:      3342 ns/iter (+/- 92)
 test tests::new_64    ... bench:      7692 ns/iter (+/- 373)
