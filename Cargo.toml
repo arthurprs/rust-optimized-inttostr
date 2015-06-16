@@ -2,3 +2,14 @@
 name = "int"
 version = "0.1.0"
 authors = ["arthurprs <arthurprs@gmail.com>"]
+
+[dependencies]
+rand="*"
+
+[dependencies.strconv]
+git="https://github.com/lifthrasiir/rust-strconv.git"
+
+
+[profile.bench]
+opt-level = 3
+lto = true

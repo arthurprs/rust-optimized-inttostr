@@ -2,6 +2,8 @@
 #![feature(test)]
 #![feature(zero_one)]
 #[cfg(test)] extern crate test;
+#[cfg(test)] extern crate strconv;
+#[cfg(test)] extern crate rand;
 
 use std::fmt::{self, Display};
 use std::ops::{Not, Add};
@@ -113,6 +115,7 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
     }
 }
 
+#[cfg(not(test))]
 fn main() {
 	unsafe {
 		let lut_ptr = &DEC_DIGITS_LUT as *const u8;
@@ -126,160 +129,11 @@ fn main() {
 }
 
 #[cfg(test)]
+pub mod bench;
+
+#[cfg(test)]
 mod tests {
 	use super::Wrapper;
-	use test;
-	use std::fmt::Write;
-	use std::{i8, i16, i32, i64};
-
-	#[bench]
-	fn _warmup(b: &mut test::Bencher) {
-		b.iter(|| 1)
-	}
-
-	#[bench]
-	fn stdlib_08(b: &mut test::Bencher) {
-		let mut n = 1i8;
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i8;
-			while i <= i8::MAX / 2 {
-				i *= 2;
-				n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn stdlib_16(b: &mut test::Bencher) {
-		let mut n = 1i16;
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i16;
-			while i <= i16::MAX / 2 {
-				i *= 2;
-				n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn stdlib_32(b: &mut test::Bencher) {
-		let mut n = 1i32;
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1;
-			while i <= i32::MAX / 2 {
-				i *= 2;
-				n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn stdlib_64(b: &mut test::Bencher) {
-		let mut n = 1i64;
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1;
-			while i <= i64::MAX / 2 {
-				i *= 2;
-				n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn new_08(b: &mut test::Bencher) {
-		let mut n = Wrapper{n: 1i8};
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i8;
-			while i <= i8::MAX / 2 {
-				i *= 2;
-				n.n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n.n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn new_16(b: &mut test::Bencher) {
-		let mut n = Wrapper{n: 1i16};
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i16;
-			while i <= i16::MAX / 2 {
-				i *= 2;
-				n.n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n.n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn new_32(b: &mut test::Bencher) {
-		let mut n = Wrapper{n: 1i32 << 16};
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i32;
-			while i <= i32::MAX / 2 {
-				i *= 2;
-				n.n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n.n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
-
-	#[bench]
-	fn new_64(b: &mut test::Bencher) {
-		let mut n = Wrapper{n: 1i64 << 16};
-		let mut buf = String::with_capacity(100);
-		b.iter(|| {
-			let mut i = 1i64;
-			while i <= i64::MAX / 2 {
-				i *= 2;
-				n.n = i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-				n.n = -i;
-				buf.clear();
-				buf.write_fmt(format_args!("{}", n));
-			}
-		})
-	}
 
 	#[test]
 	fn test_pos() {
@@ -302,9 +156,9 @@ mod tests {
 	#[test]
 	fn test_big() {
 		let mut n = Wrapper{n: 1i64};
-		for i in (0i64..100000) {
-			n.n = i * -331;
-			assert_eq!(format!("{}", i * -331), format!("{}", n));
+		for i in (10000i64..20000) {
+			n.n = i * -331 * 100000;
+			assert_eq!(format!("{}", i * -331 * 100000), format!("{}", n));
 		}
 	}
 }
