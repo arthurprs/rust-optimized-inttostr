@@ -27,12 +27,12 @@ impl Write for VoidWriter {
 
 
 macro_rules! bench_new {
-	($t:ty: $name:ident) => {
+	($t:ty: $name:ident, $samples:expr) => {
 		#[bench]
 		fn $name(b: &mut test::Bencher) {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
-			let items: Vec<_> = (0..1000).map(|_| Wrapper{n: rng.gen::<$t>()}).collect();
+			let items: Vec<_> = (0..$samples).map(|_| Wrapper{n: rng.gen::<$t>()}).collect();
 			b.iter(|| {
 				for i in &items {
 					test::black_box(buf.write_fmt(format_args!("{}", *i)));
@@ -43,12 +43,12 @@ macro_rules! bench_new {
 }
 
 macro_rules! bench_strconv {
-	($t:ty: $name:ident) => {
+	($t:ty: $name:ident, $samples:expr) => {
 		#[bench]
 		fn $name(b: &mut test::Bencher) {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
-			let items: Vec<_> = (0..1000).map(|_| UintToDec(rng.gen::<$t>())).collect();
+			let items: Vec<_> = (0..$samples).map(|_| UintToDec(rng.gen::<$t>())).collect();
 			b.iter(|| {
 				for i in &items {
 					test::black_box(buf.write_fmt(format_args!("{}", *i)));
@@ -59,12 +59,12 @@ macro_rules! bench_strconv {
 }
 
 macro_rules! bench_stdlib {
-	($t:ty: $name:ident) => {
+	($t:ty: $name:ident, $samples:expr) => {
 		#[bench]
 		fn $name(b: &mut test::Bencher) {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
-			let items: Vec<$t> = (0..1000).map(|_| rng.gen::<$t>()).collect();
+			let items: Vec<$t> = (0..$samples).map(|_| rng.gen::<$t>()).collect();
 			b.iter(|| {
 				for i in &items {
 					test::black_box(buf.write_fmt(format_args!("{}", *i)));
@@ -74,17 +74,17 @@ macro_rules! bench_stdlib {
 	};
 }
 
-bench_new!(u8: new_u08);
-bench_new!(u16: new_u16);
-bench_new!(u32: new_u32);
-bench_new!(u64: new_u64);
+bench_new!(u8: new_u08, 2000);
+bench_new!(u16: new_u16, 10000);
+bench_new!(u32: new_u32, 100000);
+bench_new!(u64: new_u64, 100000);
 
-bench_strconv!(u8: strconv_u08);
-bench_strconv!(u16: strconv_u16);
-bench_strconv!(u32: strconv_u32);
-bench_strconv!(u64: strconv_u64);
+bench_strconv!(u8: strconv_u08, 2000);
+bench_strconv!(u16: strconv_u16, 10000);
+bench_strconv!(u32: strconv_u32, 100000);
+bench_strconv!(u64: strconv_u64, 100000);
 
-bench_strconv!(u8: stdlib_u08);
-bench_strconv!(u16: stdlib_u16);
-bench_strconv!(u32: stdlib_u32);
-bench_strconv!(u64: stdlib_u64);
+bench_strconv!(u8: stdlib_u08, 2000);
+bench_strconv!(u16: stdlib_u16, 10000);
+bench_strconv!(u32: stdlib_u32, 100000);
+bench_strconv!(u64: stdlib_u64, 100000);
