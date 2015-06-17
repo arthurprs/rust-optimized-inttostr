@@ -3,7 +3,7 @@
 #![feature(zero_one)]
 #[cfg(test)] extern crate test;
 #[cfg(test)] extern crate strconv;
-#[cfg(test)] extern crate rand;
+extern crate rand;
 
 use std::fmt::{self, Display};
 use std::ops::{Not, Add};
@@ -117,15 +117,18 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
 
 #[cfg(not(test))]
 fn main() {
-	unsafe {
-		let lut_ptr = &DEC_DIGITS_LUT as *const u8;
-		for i in (0usize..DEC_DIGITS_LUT.len()) {
-			if i != 0 && i % 10 == 0 {
-				println!("");
-			}
-			print!("{:?} {:?}, ", *lut_ptr.offset(i as isize), *lut_ptr.offset(i as isize) as char);
-		}
+	use rand::{Rng, SeedableRng, StdRng};
+	const SEED: &'static [usize] = &[0, 1, 1, 2, 3, 5, 8, 13, 21, 34];
+	let mut rng: StdRng = SeedableRng::from_seed(SEED);
+	let mut hist = [0u32; 21];
+
+	for _ in (0..10000) {
+		let x: f64 = rng.gen();
+		let x = x.powf(25f64);
+		hist[((x * 2_147_483_647f64) as u32).to_string().len()] += 1;
 	}
+
+	println!("{:?}", hist);
 }
 
 #[cfg(test)]

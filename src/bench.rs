@@ -74,17 +74,98 @@ macro_rules! bench_stdlib {
 	};
 }
 
-bench_new!(u8: new_u08, 2000);
-bench_new!(u16: new_u16, 10000);
-bench_new!(u32: new_u32, 100000);
-bench_new!(u64: new_u64, 100000);
+macro_rules! bench_new_skewed {
+	($t:ty: $name:ident, $skew:expr, $samples:expr) => {
+		#[bench]
+		fn $name(b: &mut test::Bencher) {
+			let mut rng: StdRng = SeedableRng::from_seed(SEED);
+			let mut buf: VoidWriter = VoidWriter;
+			let items: Vec<_> = (0..$samples).map(|_| {
+				let x = rng.gen::<f64>().powf($skew);
+				Wrapper{n: (x * <$t>::max_value() as f64) as $t }
+			}).collect();
+			b.iter(|| {
+				for i in &items {
+					test::black_box(buf.write_fmt(format_args!("{}", *i)));
+				}
+			});
+		}
+	};
+	($t:ty: $name:ident, $samples:expr) => {
+		bench_new_skewed!($t: $name, 25f64, $samples);
+	}
+}
 
-bench_strconv!(u8: strconv_u08, 2000);
-bench_strconv!(u16: strconv_u16, 10000);
-bench_strconv!(u32: strconv_u32, 100000);
-bench_strconv!(u64: strconv_u64, 100000);
+macro_rules! bench_strconv_skewed {
+	($t:ty: $name:ident, $skew:expr, $samples:expr) => {
+		#[bench]
+		fn $name(b: &mut test::Bencher) {
+			let mut rng: StdRng = SeedableRng::from_seed(SEED);
+			let mut buf: VoidWriter = VoidWriter;
+			let items: Vec<_> = (0..$samples).map(|_| {
+				let x = rng.gen::<f64>().powf($skew);
+				UintToDec((x * <$t>::max_value() as f64) as $t )
+			}).collect();
+			b.iter(|| {
+				for i in &items {
+					test::black_box(buf.write_fmt(format_args!("{}", *i)));
+				}
+			});
+		}
+	};
+	($t:ty: $name:ident, $samples:expr) => {
+		bench_strconv_skewed!($t: $name, 25f64, $samples);
+	}
+}
 
-bench_strconv!(u8: stdlib_u08, 2000);
-bench_strconv!(u16: stdlib_u16, 10000);
-bench_strconv!(u32: stdlib_u32, 100000);
-bench_strconv!(u64: stdlib_u64, 100000);
+macro_rules! bench_stdlib_skewed {
+	($t:ty: $name:ident, $skew:expr, $samples:expr) => {
+		#[bench]
+		fn $name(b: &mut test::Bencher) {
+			let mut rng: StdRng = SeedableRng::from_seed(SEED);
+			let mut buf: VoidWriter = VoidWriter;
+			let items: Vec<_> = (0..$samples).map(|_| {
+				let x = rng.gen::<f64>().powf($skew);
+				(x * <$t>::max_value() as f64) as $t
+			}).collect();
+			b.iter(|| {
+				for i in &items {
+					test::black_box(buf.write_fmt(format_args!("{}", *i)));
+				}
+			});
+		}
+	};
+	($t:ty: $name:ident, $samples:expr) => {
+		bench_stdlib_skewed!($t: $name, 25f64, $samples);
+	}
+}
+
+bench_new!(u8: random_new_u08, 2000);
+bench_new!(u16: random_new_u16, 10000);
+bench_new!(u32: random_new_u32, 100000);
+bench_new!(u64: random_new_u64, 100000);
+
+bench_strconv!(u8: random_strconv_u08, 2000);
+bench_strconv!(u16: random_strconv_u16, 10000);
+bench_strconv!(u32: random_strconv_u32, 100000);
+bench_strconv!(u64: random_strconv_u64, 100000);
+
+bench_strconv!(u8: random_stdlib_u08, 2000);
+bench_strconv!(u16: random_stdlib_u16, 10000);
+bench_strconv!(u32: random_stdlib_u32, 100000);
+bench_strconv!(u64: random_stdlib_u64, 100000);
+
+bench_new_skewed!(u8: skewed_new_u08, 2000);
+bench_new_skewed!(u16: skewed_new_u16, 10000);
+bench_new_skewed!(u32: skewed_new_u32, 100000);
+bench_new_skewed!(u64: skewed_new_u64, 100000);
+
+bench_strconv_skewed!(u8: skewed_strconv_u08, 2000);
+bench_strconv_skewed!(u16: skewed_strconv_u16, 10000);
+bench_strconv_skewed!(u32: skewed_strconv_u32, 100000);
+bench_strconv_skewed!(u64: skewed_strconv_u64, 100000);
+
+bench_strconv_skewed!(u8: skewed_stdlib_u08, 2000);
+bench_strconv_skewed!(u16: skewed_stdlib_u16, 10000);
+bench_strconv_skewed!(u32: skewed_stdlib_u32, 100000);
+bench_strconv_skewed!(u64: skewed_stdlib_u64, 100000);
