@@ -6,9 +6,9 @@
 extern crate rand;
 
 use std::fmt::{self, Display};
-use std::ops::{Not, Add};
+use std::ops::Not;
 use std::mem;
-use std::num::{Zero, One};
+use std::num::{Zero, One, Wrapping};
 use std::str;
 use std::ptr;
 
@@ -45,11 +45,13 @@ const DEC_DIGITS_LUT: [u8; 200] = [
     '9' as u8,'0' as u8,'9' as u8,'1' as u8,'9' as u8,'2' as u8,'9' as u8,'3' as u8,'9' as u8,'4' as u8,'9' as u8,'5' as u8,'9' as u8,'6' as u8,'9' as u8,'7' as u8,'9' as u8,'8' as u8,'9' as u8,'9' as u8
 ];
 
-impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + Zero + One + Display + Ord + Copy {
+impl<T> Display for Wrapper<T> where
+			T: Not<Output=T> + AsU64 + Zero + One + Display + Ord + Copy {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		let is_positive = self.n >= T::zero();
 		let mut n: u64 = if ! is_positive {
-			(!self.n + T::one()).as_u64()
+			let Wrapping(n) = Wrapping((!self.n).as_u64()) + Wrapping(1);
+			n
 		} else {
 			self.n.as_u64()
 		};
@@ -59,24 +61,6 @@ impl<T> Display for Wrapper<T> where T: Not<Output=T> + Add<Output=T> + AsU64 + 
 		let lut_ptr = &DEC_DIGITS_LUT as *const u8;
 
 		unsafe {
-			// if T::max_u64() >= 100000000 {
-			// 	while n >= 100000000 {
-			// 		let rem = (n % 100000000) as isize;
-			// 		n /= 100000000;
-			//         let b = rem / 10000;
-			//         let c = rem % 10000;
-			//         let d1 = (b / 100) << 1;
-			//         let d2 = (b % 100) << 1;
-			//         let d3 = (c / 100) << 1;
-			//         let d4 = (c % 100) << 1;
-			// 		curr -= 8;
-			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
-			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d2), buf_ptr.offset(curr + 2), 2);
-			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d3), buf_ptr.offset(curr + 4), 2);
-			// 		ptr::copy_nonoverlapping(lut_ptr.offset(d4), buf_ptr.offset(curr + 6), 2);
-			// 	}
-			// }
-
 			if T::max_u64() >= 10000 {
 				while n >= 10000 {
 					let rem = (n % 10000) as isize;
@@ -137,6 +121,7 @@ pub mod bench;
 #[cfg(test)]
 mod tests {
 	use super::Wrapper;
+	use rand::{self, Rng};
 
 	#[test]
 	fn test_pos() {
@@ -157,11 +142,32 @@ mod tests {
 	}
 
 	#[test]
-	fn test_big() {
-		let mut n = Wrapper{n: 1i64};
-		for i in (10000i64..20000) {
-			n.n = i * -331 * 100000;
-			assert_eq!(format!("{}", i * -331 * 100000), format!("{}", n));
+	fn test_overflow() {
+		assert_eq!("-128", format!("{}", Wrapper{n: -128i8}));
+		assert_eq!("-32768", format!("{}", Wrapper{n: -32768i16}));
+		assert_eq!("-2147483648", format!("{}", Wrapper{n: -2147483648i32}));
+		assert_eq!("-9223372036854775808", format!("{}", Wrapper{n: -9223372036854775808i64}));
+	}
+
+	macro_rules! test_type {
+		($t:ty: $name:ident) => {
+			#[test]
+			fn $name() {
+				let mut rnd = rand::weak_rng();
+				for _ in (0..100000) {
+					let i: $t = rnd.gen();
+					assert_eq!(format!("{}", i), format!("{}", Wrapper{n: i}));
+				}
+			}
 		}
 	}
+
+	test_type!(u8: test_u8);
+	test_type!(u16: test_u16);
+	test_type!(u32: test_u32);
+	test_type!(u64: test_u64);
+	test_type!(i8: test_i8);
+	test_type!(i16: test_i16);
+	test_type!(i32: test_i32);
+	test_type!(i64: test_i64);
 }
