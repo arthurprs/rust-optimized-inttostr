@@ -81,8 +81,11 @@ macro_rules! bench_new_skewed {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
 			let items: Vec<_> = (0..$samples).map(|_| {
-				let x = rng.gen::<f64>().powf($skew);
-				Wrapper{n: (x * <$t>::max_value() as f64) as $t }
+				let x: f64 = rng.gen();
+				let x = (1f64 + ((x - 1f64) * (x + 1f64))).powf(1f64);
+				let x = (x * (u64::max_value() as f64).log10()) as u64;
+				let x = x + (rng.gen::<f64>() * x as f64 / 10f64) as u64;
+				Wrapper{n: x as $t }
 			}).collect();
 			b.iter(|| {
 				for i in &items {
@@ -103,8 +106,11 @@ macro_rules! bench_strconv_skewed {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
 			let items: Vec<_> = (0..$samples).map(|_| {
-				let x = rng.gen::<f64>().powf($skew);
-				UintToDec((x * <$t>::max_value() as f64) as $t )
+				let x: f64 = rng.gen();
+				let x = (1f64 + ((x - 1f64) * (x + 1f64))).powf(1f64);
+				let x = (x * (u64::max_value() as f64).log10()) as u64;
+				let x = x + (rng.gen::<f64>() * x as f64 / 10f64) as u64;
+				UintToDec(x as $t )
 			}).collect();
 			b.iter(|| {
 				for i in &items {
@@ -125,8 +131,11 @@ macro_rules! bench_stdlib_skewed {
 			let mut rng: StdRng = SeedableRng::from_seed(SEED);
 			let mut buf: VoidWriter = VoidWriter;
 			let items: Vec<_> = (0..$samples).map(|_| {
-				let x = rng.gen::<f64>().powf($skew);
-				(x * <$t>::max_value() as f64) as $t
+				let x: f64 = rng.gen();
+				let x = (1f64 + ((x - 1f64) * (x + 1f64))).powf(1f64);
+				let x = (x * (u64::max_value() as f64).log10()) as u64;
+				let x = x + (rng.gen::<f64>() * x as f64 / 10f64) as u64;
+				x as $t
 			}).collect();
 			b.iter(|| {
 				for i in &items {
