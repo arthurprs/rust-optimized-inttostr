@@ -6,8 +6,8 @@ authors = ["arthurprs <arthurprs@gmail.com>"]
 [dependencies]
 rand="*"
 
-[dependencies.strconv]
-git="https://github.com/lifthrasiir/rust-strconv.git"
+#[dependencies.strconv]
+#git="https://github.com/lifthrasiir/rust-strconv.git"
 
 
 [profile.bench]

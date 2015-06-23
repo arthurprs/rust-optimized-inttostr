@@ -1,7 +1,7 @@
 #![feature(custom_derive)]
 #![feature(test)]
 #[cfg(test)] extern crate test;
-#[cfg(test)] extern crate strconv;
+// #[cfg(test)] extern crate strconv;
 extern crate rand;
 
 use std::fmt::{self, Display};
@@ -26,9 +26,7 @@ macro_rules! impl_AsUInt {
 
 impl_AsUInt! { i8, i16, i32, i64, isize, u8, u16, u32, u64, usize }
 
-pub struct Wrapper<T> {
-    n: T
-}
+pub struct Wrapper<T>(pub T);
 
 const DEC_DIGITS_LUT: [u8; 200] = [
     '0' as u8,'0' as u8,'0' as u8,'1' as u8,'0' as u8,'2' as u8,'0' as u8,'3' as u8,'0' as u8,'4' as u8,'0' as u8,'5' as u8,'0' as u8,'6' as u8,'0' as u8,'7' as u8,'0' as u8,'8' as u8,'0' as u8,'9' as u8,
@@ -48,12 +46,13 @@ macro_rules! impl_Display {
 	impl Display for Wrapper<$t> {
 		#[allow(unused_comparisons)]
 		fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-			let is_positive = self.n >= 0;
+			let Wrapper(n) = *self;
+			let is_positive = n >= 0;
 			let mut n = if ! is_positive {
-				let Wrapping(n) = Wrapping(!self.n.$conv_fn()) + Wrapping(1);
+				let Wrapping(n) = Wrapping(!n.$conv_fn()) + Wrapping(1);
 				n
 			} else {
-				self.n.$conv_fn()
+				n.$conv_fn()
 			};
 			let mut buf: [u8; 20] = unsafe { mem::uninitialized() };
 			let mut curr = buf.len() as isize;
@@ -139,28 +138,26 @@ mod tests {
 
 	#[test]
 	fn test_pos() {
-		let mut n = Wrapper{n: 1i64};
 		for i in (0i64..10000) {
-			n.n = i;
+			let n = Wrapper(i);
 			assert_eq!(format!("{}", i), format!("{}", n));
 		}
 	}
 
 	#[test]
 	fn test_neg() {
-		let mut n = Wrapper{n: 1i64};
 		for i in (0i64..10000) {
-			n.n = -i;
+			let n = Wrapper(-i);
 			assert_eq!(format!("{}", -i), format!("{}", n));
 		}
 	}
 
 	#[test]
 	fn test_overflow() {
-		assert_eq!("-128", format!("{}", Wrapper{n: -128i8}));
-		assert_eq!("-32768", format!("{}", Wrapper{n: -32768i16}));
-		assert_eq!("-2147483648", format!("{}", Wrapper{n: -2147483648i32}));
-		assert_eq!("-9223372036854775808", format!("{}", Wrapper{n: -9223372036854775808i64}));
+		assert_eq!("-128", format!("{}", Wrapper(-128i8)));
+		assert_eq!("-32768", format!("{}", Wrapper(-32768i16)));
+		assert_eq!("-2147483648", format!("{}", Wrapper(-2147483648i32)));
+		assert_eq!("-9223372036854775808", format!("{}", Wrapper(-9223372036854775808i64)));
 	}
 
 	macro_rules! test_type {
@@ -170,7 +167,7 @@ mod tests {
 				let mut rnd = rand::weak_rng();
 				for _ in (0..1000000) {
 					let i: $t = rnd.gen();
-					assert_eq!(format!("{}", i), format!("{}", Wrapper{n: i}));
+					assert_eq!(format!("{}", i), format!("{}", Wrapper(i)));
 				}
 			}
 		}
