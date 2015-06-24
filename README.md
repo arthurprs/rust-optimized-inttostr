@@ -8,13 +8,16 @@ My hopes are that this work allows measurable improvements to json serializers.
 
 Running with rustc 1.2.0-nightly (cffaf0e7a 2015-06-23) @ x64 Linux - Intel(R) Core(TM) i7-2670QM CPU @ 2.20GHz
 
-* test string length histograms for u32
+## string length histograms for u32
+
+Ex: "3" => 1, "31" => 2, "1001" => 4 
+
 * h (big numbers skew)
-* [0, 0, 5, 29, 103, 212, 551, 1138, 1887, 3196, 2879]
+[0, 0, 5, 29, 103, 212, 551, 1138, 1887, 3196, 2879]
 * m (slight small number skew) :
-* [0, 1505, 1177, 1062, 1040, 983, 952, 955, 919, 877, 530]
+[0, 1505, 1177, 1062, 1040, 983, 952, 955, 919, 877, 530]
 * l (small numbers skew):
-* [0, 3547, 1317, 1000, 827, 730, 665, 582, 538, 482, 312]
+[0, 3547, 1317, 1000, 827, 730, 665, 582, 538, 482, 312]
 
 ```
 test bench::skewed_h_new_u08    ... bench:      70,989 ns/iter (+/- 7,817)
