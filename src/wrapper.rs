@@ -54,6 +54,7 @@ macro_rules! impl_Display {
 			let lut_ptr = &DEC_DIGITS_LUT as *const u8;
 
 			unsafe {
+				// eagerly decode 4 characters at a time
 				if <$t>::max_value() as u64 >= 10000 {
 					while n >= 10000 {
 						let rem = (n % 10000) as isize;
@@ -67,22 +68,23 @@ macro_rules! impl_Display {
 					}
 				}
 
-				// n can be safelly treated as isize from this point on
-				// this increases performance on 32bit systems
-				let mut n = n as isize;
+				// if we reach here numbers are <= 9999, so at most 4 chars long
+				let mut n = n as isize; // possibly reduce 64bit math
 
-				while n >= 100 {
+				// decode 2 more chars, if > 2 chars
+				if n >= 100 {
 					let d1 = (n % 100) << 1;
 					n /= 100;
 					curr -= 2;
 					ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
 				}
 
+				// decode last 1 or 2 chars
 				if n < 10 {
 					curr -= 1;
 					*buf_ptr.offset(curr) = (n as u8) + 48;
 				} else {
-					let d1 = (n as isize) << 1;
+					let d1 = n << 1;
 					curr -= 2;
 					ptr::copy_nonoverlapping(lut_ptr.offset(d1), buf_ptr.offset(curr), 2);
 				}
