@@ -10,6 +10,6 @@ rand="*"
 #git="https://github.com/lifthrasiir/rust-strconv.git"
 
 
-[profile.bench]
-opt-level = 3
-lto = true
+#[profile.bench]
+#opt-level = 3
+#lto = true

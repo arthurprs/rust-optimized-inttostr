@@ -6,36 +6,42 @@ My hopes are that this work allows measurable improvements to json serializers.
 
 # Results
 
-Running with rust 1.2 nightly @ x64 Linux - Intel(R) Core(TM) i7-2670QM CPU @ 2.20GHz
+Running with rustc 1.2.0-nightly (cffaf0e7a 2015-06-23) @ x64 Linux - Intel(R) Core(TM) i7-2670QM CPU @ 2.20GHz
 
-* random: random numbers distributed equally in the type range
-* skewed: random numbers skewed to smaller numbers (trying to reflect real usage)
+* test string length histograms for u32
+* h (big numbers skew)
+* [0, 0, 5, 29, 103, 212, 551, 1138, 1887, 3196, 2879]
+* m (slight small number skew) :
+* [0, 1505, 1177, 1062, 1040, 983, 952, 955, 919, 877, 530]
+* l (small numbers skew):
+* [0, 3547, 1317, 1000, 827, 730, 665, 582, 538, 482, 312]
 
 ```
-test bench::random_new_u08     ... bench:     73063 ns/iter (+/- 2712)
-test bench::random_new_u16     ... bench:    349182 ns/iter (+/- 16315)
-test bench::random_new_u32     ... bench:   3925660 ns/iter (+/- 342846)
-test bench::random_new_u64     ... bench:   5347440 ns/iter (+/- 261020)
-test bench::random_stdlib_u08  ... bench:     80722 ns/iter (+/- 3867)
-test bench::random_stdlib_u16  ... bench:    385708 ns/iter (+/- 30096)
-test bench::random_stdlib_u32  ... bench:   4446318 ns/iter (+/- 248931)
-test bench::random_stdlib_u64  ... bench:   6747984 ns/iter (+/- 403998)
-test bench::random_strconv_u08 ... bench:     80608 ns/iter (+/- 6822)
-test bench::random_strconv_u16 ... bench:    393144 ns/iter (+/- 23496)
-test bench::random_strconv_u32 ... bench:   4427777 ns/iter (+/- 285315)
-test bench::random_strconv_u64 ... bench:   6761469 ns/iter (+/- 485563)
-test bench::skewed_new_u08     ... bench:     68073 ns/iter (+/- 3216)
-test bench::skewed_new_u16     ... bench:    349168 ns/iter (+/- 16996)
-test bench::skewed_new_u32     ... bench:   3573622 ns/iter (+/- 274548)
-test bench::skewed_new_u64     ... bench:   3675003 ns/iter (+/- 228779)
-test bench::skewed_stdlib_u08  ... bench:     81506 ns/iter (+/- 4399)
-test bench::skewed_stdlib_u16  ... bench:    440257 ns/iter (+/- 25390)
-test bench::skewed_stdlib_u32  ... bench:   4772374 ns/iter (+/- 293192)
-test bench::skewed_stdlib_u64  ... bench:   5878061 ns/iter (+/- 306407)
-test bench::skewed_strconv_u08 ... bench:     82853 ns/iter (+/- 3512)
-test bench::skewed_strconv_u16 ... bench:    431086 ns/iter (+/- 24820)
-test bench::skewed_strconv_u32 ... bench:   4656460 ns/iter (+/- 313516)
-test bench::skewed_strconv_u64 ... bench:   5851998 ns/iter (+/- 250406)
+test bench::skewed_h_new_u08    ... bench:      70,989 ns/iter (+/- 7,817)
+test bench::skewed_h_new_u16    ... bench:     378,118 ns/iter (+/- 22,320)
+test bench::skewed_h_new_u32    ... bench:   4,290,177 ns/iter (+/- 420,060)
+test bench::skewed_h_new_u64    ... bench:   5,159,141 ns/iter (+/- 509,104)
+test bench::skewed_h_stdlib_u08 ... bench:      70,296 ns/iter (+/- 5,432)
+test bench::skewed_h_stdlib_u16 ... bench:     424,123 ns/iter (+/- 29,182)
+test bench::skewed_h_stdlib_u32 ... bench:   5,462,581 ns/iter (+/- 490,533)
+test bench::skewed_h_stdlib_u64 ... bench:   8,467,202 ns/iter (+/- 800,586)
+test bench::skewed_l_new_u08    ... bench:      70,563 ns/iter (+/- 5,619)
+test bench::skewed_l_new_u16    ... bench:     380,621 ns/iter (+/- 32,223)
+test bench::skewed_l_new_u32    ... bench:   4,224,106 ns/iter (+/- 197,825)
+test bench::skewed_l_new_u64    ... bench:   5,145,698 ns/iter (+/- 505,134)
+test bench::skewed_l_stdlib_u08 ... bench:      70,344 ns/iter (+/- 5,702)
+test bench::skewed_l_stdlib_u16 ... bench:     423,822 ns/iter (+/- 16,516)
+test bench::skewed_l_stdlib_u32 ... bench:   5,551,774 ns/iter (+/- 509,895)
+test bench::skewed_l_stdlib_u64 ... bench:   8,196,451 ns/iter (+/- 623,838)
+test bench::skewed_m_new_u08    ... bench:      68,856 ns/iter (+/- 4,890)
+test bench::skewed_m_new_u16    ... bench:     376,159 ns/iter (+/- 40,527)
+test bench::skewed_m_new_u32    ... bench:   4,274,610 ns/iter (+/- 223,194)
+test bench::skewed_m_new_u64    ... bench:   5,115,321 ns/iter (+/- 258,833)
+test bench::skewed_m_stdlib_u08 ... bench:      68,915 ns/iter (+/- 3,567)
+test bench::skewed_m_stdlib_u16 ... bench:     416,575 ns/iter (+/- 16,627)
+test bench::skewed_m_stdlib_u32 ... bench:   5,299,133 ns/iter (+/- 198,394)
+test bench::skewed_m_stdlib_u64 ... bench:   8,326,535 ns/iter (+/- 299,953)
+
 ```
 
 # TODO

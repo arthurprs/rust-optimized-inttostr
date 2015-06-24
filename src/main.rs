@@ -60,7 +60,7 @@ macro_rules! impl_Display {
 			let lut_ptr = &DEC_DIGITS_LUT as *const u8;
 
 			unsafe {
-				if <$t>::max_value() as u32 >= 10000 {
+				if <$t>::max_value() as u64 >= 10000 {
 					while n >= 10000 {
 						let rem = (n % 10000) as isize;
 						n /= 10000;
@@ -107,25 +107,42 @@ impl_Display!(isize, usize: as_u32);
 impl_Display!(isize, usize: as_u64);
 
 
-#[cfg(not(test))]
-fn main() {
-	use std::u64;
+fn collect_samples(samples: usize, skew: f64) -> Vec<u32> {
 	use rand::{Rng, SeedableRng, StdRng};
 	const SEED: &'static [usize] = &[0, 1, 1, 2, 3, 5, 8, 13, 21, 34];
-	let mut rng: StdRng = SeedableRng::from_seed(SEED);
-	let mut hist = [0u32; 21];
 
-	for _ in (0..10000) {
+	let mut rng: StdRng = SeedableRng::from_seed(SEED);
+
+	(0..samples).map(|_|{
 		let x: f64 = rng.gen();
-		let x = (1f64 + ((x - 1f64) * (x + 1f64))).powf(1f64);
-		let x = (x * (u64::max_value() as f64).log10()) as u64;
+		let x = (1f64 + ((x - 1f64) * (x + 1f64))).powf(skew);
+		let x = (x * (u32::max_value() as f64).log10()) as u32;
 		let x = 10u64.pow(x as u32);
 		let x = x + (rng.gen::<f64>() * x as f64 / 10f64) as u64;
-		// println!("{:?}", x);
+		x as u32
+	}).collect()
+}
+
+
+#[cfg(not(test))]
+fn main() {
+	let mut hist = [0u32; 11];
+	for x in collect_samples(10000, 0.1f64) {
 		hist[x.to_string().len() as usize] += 1;
 	}
+	println!("h: {:?}", hist);
 
-	println!("{:?}", hist);
+	let mut hist = [0u32; 11];
+	for x in collect_samples(10000, 0.6f64) {
+		hist[x.to_string().len() as usize] += 1;
+	}
+	println!("m: {:?}", hist);
+
+	let mut hist = [0u32; 11];
+	for x in collect_samples(10000, 1.1f64) {
+		hist[x.to_string().len() as usize] += 1;
+	}
+	println!("l: {:?}", hist);
 }
 
 #[cfg(test)]
