@@ -70,15 +70,15 @@ macro_rules! bench_stdlib_skewed {
 	};
 }
 
-bench_new_skewed!(u8: skewed_l_new_u08, 2000, 1.1f64);
-bench_new_skewed!(u16: skewed_l_new_u16, 10000, 1.1f64);
-bench_new_skewed!(u32: skewed_l_new_u32, 100000, 1.1f64);
-bench_new_skewed!(u64: skewed_l_new_u64, 100000, 1.1f64);
+bench_new_skewed!(u8: skewed_l_new_u08, 2000, 1.5f64);
+bench_new_skewed!(u16: skewed_l_new_u16, 10000, 1.5f64);
+bench_new_skewed!(u32: skewed_l_new_u32, 100000, 1.5f64);
+bench_new_skewed!(u64: skewed_l_new_u64, 100000, 1.5f64);
 
-bench_stdlib_skewed!(u8: skewed_l_stdlib_u08, 2000, 1.1f64);
-bench_stdlib_skewed!(u16: skewed_l_stdlib_u16, 10000, 1.1f64);
-bench_stdlib_skewed!(u32: skewed_l_stdlib_u32, 100000, 1.1f64);
-bench_stdlib_skewed!(u64: skewed_l_stdlib_u64, 100000, 1.1f64);
+bench_stdlib_skewed!(u8: skewed_l_stdlib_u08, 2000, 1.5f64);
+bench_stdlib_skewed!(u16: skewed_l_stdlib_u16, 10000, 1.5f64);
+bench_stdlib_skewed!(u32: skewed_l_stdlib_u32, 100000, 1.5f64);
+bench_stdlib_skewed!(u64: skewed_l_stdlib_u64, 100000, 1.5f64);
 
 bench_new_skewed!(u8: skewed_m_new_u08, 2000, 0.6f64);
 bench_new_skewed!(u16: skewed_m_new_u16, 10000, 0.6f64);

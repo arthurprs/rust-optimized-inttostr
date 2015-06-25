@@ -38,7 +38,7 @@ fn main() {
 	println!("m: {:?}", hist);
 
 	let mut hist = [0u32; 11];
-	for x in collect_samples(10000, 1.1f64) {
+	for x in collect_samples(10000, 1.5f64) {
 		hist[x.to_string().len() as usize] += 1;
 	}
 	println!("l: {:?}", hist);
