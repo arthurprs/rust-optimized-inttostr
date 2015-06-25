@@ -6,11 +6,7 @@ My hopes are that this work allows measurable improvements to json serializers.
 
 # Results
 
-Running with rustc 1.2.0-nightly (cffaf0e7a 2015-06-23) @ x64 Linux - Intel(R) Core(TM) i7-2670QM CPU @ 2.20GHz
-
 ## string length histograms for u32
-
-Ex: "3" => 1, "31" => 2, "1001" => 4 
 
 * h (big numbers skew)
 [0, 0, 5, 29, 103, 212, 551, 1138, 1887, 3196, 2879]
@@ -18,6 +14,8 @@ Ex: "3" => 1, "31" => 2, "1001" => 4
 [0, 1505, 1177, 1062, 1040, 983, 952, 955, 919, 877, 530]
 * l (small numbers skew):
 [0, 4684, 1205, 863, 713, 600, 501, 439, 416, 346, 233]
+
+Running with rustc 1.2.0-nightly (cffaf0e7a 2015-06-23) @ x64 Linux - Intel(R) Core(TM) i7-2670QM @ 2.20Ghz (My notebook CPU)
 
 ```
 test bench::skewed_h_new_u08    ... bench:      67,156 ns/iter (+/- 3,687)
@@ -46,8 +44,35 @@ test bench::skewed_m_stdlib_u32 ... bench:   5,422,042 ns/iter (+/- 330,263)
 test bench::skewed_m_stdlib_u64 ... bench:   8,358,590 ns/iter (+/- 418,777)
 ```
 
+Running with rustc 1.3.0-nightly (e5a28bca7 2015-06-25) @ x86 Linux - Intel(R) Xeon(R) CPU E5-2650 0 @ 2.00GHz (EC2 c1.medium)
+
+```
+test bench::skewed_h_new_u08    ... bench:     128,062 ns/iter (+/- 624)
+test bench::skewed_h_new_u16    ... bench:     701,687 ns/iter (+/- 2,595)
+test bench::skewed_h_new_u32    ... bench:   8,013,071 ns/iter (+/- 86,295)
+test bench::skewed_h_new_u64    ... bench:  20,619,636 ns/iter (+/- 244,472)
+test bench::skewed_h_stdlib_u08 ... bench:     139,061 ns/iter (+/- 4,208)
+test bench::skewed_h_stdlib_u16 ... bench:     840,872 ns/iter (+/- 8,870)
+test bench::skewed_h_stdlib_u32 ... bench:  10,934,092 ns/iter (+/- 86,377)
+test bench::skewed_h_stdlib_u64 ... bench:  62,690,245 ns/iter (+/- 4,648,790)
+test bench::skewed_l_new_u08    ... bench:     128,245 ns/iter (+/- 1,491)
+test bench::skewed_l_new_u16    ... bench:     702,062 ns/iter (+/- 13,180)
+test bench::skewed_l_new_u32    ... bench:   8,021,507 ns/iter (+/- 325,452)
+test bench::skewed_l_new_u64    ... bench:  20,596,010 ns/iter (+/- 962,453)
+test bench::skewed_l_stdlib_u08 ... bench:     139,014 ns/iter (+/- 7,428)
+test bench::skewed_l_stdlib_u16 ... bench:     840,780 ns/iter (+/- 16,955)
+test bench::skewed_l_stdlib_u32 ... bench:  10,926,288 ns/iter (+/- 309,821)
+test bench::skewed_l_stdlib_u64 ... bench:  62,649,913 ns/iter (+/- 1,106,527)
+test bench::skewed_m_new_u08    ... bench:     128,949 ns/iter (+/- 16,267)
+test bench::skewed_m_new_u16    ... bench:     706,043 ns/iter (+/- 73,190)
+test bench::skewed_m_new_u32    ... bench:   8,001,205 ns/iter (+/- 219,644)
+test bench::skewed_m_new_u64    ... bench:  20,569,162 ns/iter (+/- 430,049)
+test bench::skewed_m_stdlib_u08 ... bench:     138,840 ns/iter (+/- 5,948)
+test bench::skewed_m_stdlib_u16 ... bench:     840,655 ns/iter (+/- 9,596)
+test bench::skewed_m_stdlib_u32 ... bench:  10,949,664 ns/iter (+/- 191,620)
+test bench::skewed_m_stdlib_u64 ... bench:  62,858,086 ns/iter (+/- 1,316,625)
+```
+
 # TODO
 
-* Check performance for 32bit systems
-* Further optimizations
 * Possibly adapt the code and file a PR to rust stdlib?
