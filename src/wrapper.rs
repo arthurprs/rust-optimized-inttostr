@@ -5,16 +5,16 @@ use std::str;
 use std::ptr;
 
 trait AsUInt {
-	fn as_u64(self) -> u64;
-	fn as_u32(self) -> u32;
+	fn to_u64(&self) -> u64;
+	fn to_u32(&self) -> u32;
 }
 
 macro_rules! impl_AsUInt {
 	($($t:ident),*) => ($(impl AsUInt for $t {
 		#[inline(always)]
-        fn as_u64(self) -> u64 { self as u64 }
+        fn to_u64(&self) -> u64 { *self as u64 }
 		#[inline(always)]
-        fn as_u32(self) -> u32 { self as u32 }
+        fn to_u32(&self) -> u32 { *self as u32 }
     })*)
 }
 
@@ -96,12 +96,12 @@ macro_rules! impl_Display {
 	})*);
 }
 
-impl_Display!(i8, u8, i16, u16, i32, u32: as_u32);
-impl_Display!(i64, u64: as_u64);
+impl_Display!(i8, u8, i16, u16, i32, u32: to_u32);
+impl_Display!(i64, u64: to_u64);
 #[cfg(target_pointer_width = "32")]
-impl_Display!(isize, usize: as_u32);
+impl_Display!(isize, usize: to_u32);
 #[cfg(target_pointer_width = "64")]
-impl_Display!(isize, usize: as_u64);
+impl_Display!(isize, usize: to_u64);
 
 /// An error which can be returned when parsing an integer.
 #[derive(Debug, Clone, PartialEq)]
@@ -257,6 +257,10 @@ mod from_str_tests {
 		let conv: Result<Wrapper<i8>, _> = FromStr::from_str("--129");
 		assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
 		let conv: Result<Wrapper<i8>, _> = FromStr::from_str("¼²¼");
+		assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
+		let conv: Result<Wrapper<i8>, _> = FromStr::from_str("ฉั1");
+		assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
+		let conv: Result<Wrapper<i8>, _> = FromStr::from_str("Съешь");
 		assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
 	}
 

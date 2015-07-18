@@ -32,13 +32,13 @@ fn main() {
 	println!("h: {:?}", hist);
 
 	let mut hist = [0u32; 11];
-	for x in collect_samples(10000, 0.6f64) {
+	for x in collect_samples(10000, 0.9f64) {
 		hist[x.to_string().len() as usize] += 1;
 	}
 	println!("m: {:?}", hist);
 
 	let mut hist = [0u32; 11];
-	for x in collect_samples(10000, 1.5f64) {
+	for x in collect_samples(10000, 5f64) {
 		hist[x.to_string().len() as usize] += 1;
 	}
 	println!("l: {:?}", hist);
