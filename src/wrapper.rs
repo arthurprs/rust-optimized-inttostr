@@ -236,26 +236,14 @@ mod from_str_tests {
 
     #[test]
     fn test_invalid() {
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("--129");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("¼²¼");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("ฉั1");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("Съешь");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
+        assert_eq!("--129".parse::<Wrapper<i8>>(), Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
+        assert_eq!("Съешь".parse::<Wrapper<u8>>(), Err(ParseIntError{ kind: IntErrorKind::InvalidDigit }));
     }
 
     #[test]
     fn test_empty() {
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("-");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::Empty }));
-        let conv: Result<Wrapper<u8>, _> = FromStr::from_str("-");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::Empty }));
-        let conv: Result<Wrapper<i8>, _> = FromStr::from_str("");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::Empty }));
-        let conv: Result<Wrapper<u8>, _> = FromStr::from_str("");
-        assert_eq!(conv, Err(ParseIntError{ kind: IntErrorKind::Empty }));
+        assert_eq!("-".parse::<Wrapper<i8>>(), Err(ParseIntError{ kind: IntErrorKind::Empty }));
+        assert_eq!("".parse::<Wrapper<u8>>(), Err(ParseIntError{ kind: IntErrorKind::Empty }));
     }
 
     macro_rules! test_from_str_type {
