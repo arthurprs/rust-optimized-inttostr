@@ -1,3 +1,5 @@
+# This work is now merged into Rust https://github.com/rust-lang/rust/pull/27110
+
 # Optimized (U)Int* format/parse methods
 
 As of Jun 14 2015 Rust still uses a naive implementation of integer to decimal strings. The string parsing can be improved as well.
